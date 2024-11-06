@@ -1,5 +1,6 @@
 package com.rxmobileteam.lecture1.service;
 
+
 import org.jetbrains.annotations.NotNull;
 
 public class Product {
@@ -21,6 +22,25 @@ public class Product {
         this.name = name;
         this.description = description;
         this.price = price;
+    }
+
+    @NotNull
+    public String getId() {
+        return id;
+    }
+
+    @NotNull
+    public String getName() {
+        return name;
+    }
+
+    @NotNull
+    public String getDescription() {
+        return description;
+    }
+
+    public double getPrice() {
+        return price;
     }
 
     @Override
