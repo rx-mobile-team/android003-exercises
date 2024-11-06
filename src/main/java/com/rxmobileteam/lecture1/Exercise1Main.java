@@ -4,6 +4,8 @@ import com.rxmobileteam.lecture1.factory.ProductServiceFactory;
 import com.rxmobileteam.lecture1.service.Product;
 import com.rxmobileteam.lecture1.service.ProductService;
 
+import java.util.stream.Collectors;
+
 public class Exercise1Main {
     public static void main(String[] args) {
         ProductService productService = new ProductServiceFactory().createProductService();
@@ -47,14 +49,15 @@ public class Exercise1Main {
         productService.addProduct(samsungGalaxyS21);
         productService.addProduct(samsungGalaxyS21Ultra);
 
-        System.out.println("Search for 'Samsung':");
+        String query = "Samsung";
+        System.out.printf("Search for %s: \n", query);
+        System.out.print("Result: ");
+        System.out.println(productService.searchProducts(query).size());
         System.out.println(
             String.join(
                 "\n",
-                productService.searchProducts("Samsung")
-                    .stream()
-                    .map(Product::toString)
-                    .toList()
+                productService.searchProducts(query)
+                    .stream().map(Product::toString).collect(Collectors.toSet())
             )
         );
     }
