@@ -7,5 +7,5 @@ import java.util.Set;
 
 public interface ProductInterface {
     boolean addProduct(Product product);
-    Set<Product> findAll(String query);
+    Set<Product> findAll();
 }

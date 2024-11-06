@@ -38,6 +38,9 @@ public class ProductService {
      */
     @NotNull
     public List<Product> searchProducts(@NotNull String query) {
-        return productDao.findAll(query).stream().toList();
+        List<Product> products = productDao.findAll().stream().toList();
+        return products.stream()
+                .filter(product -> product.getName().contains(query) || product.getDescription().contains(query))
+                .toList();
     }
 }
