@@ -1,13 +1,15 @@
 package com.rxmobileteam.lecture1;
 
+import com.rxmobileteam.lecture1.data.Dao;
+import com.rxmobileteam.lecture1.data.ProductDao;
 import com.rxmobileteam.lecture1.factory.ProductServiceFactory;
 import com.rxmobileteam.lecture1.service.Product;
 import com.rxmobileteam.lecture1.service.ProductService;
 
 public class Exercise1Main {
     public static void main(String[] args) {
-        ProductService productService = new ProductServiceFactory().createProductService();
-
+        Dao productDao = new ProductDao();
+        ProductService productService = new ProductServiceFactory().createProductService(productDao);
         Product iPhone12 = new Product(
             "1",
             "iPhone 12",
@@ -51,7 +53,7 @@ public class Exercise1Main {
         System.out.println(
             String.join(
                 "\n",
-                productService.searchProducts("Samsung")
+                productService.searchProducts("2")
                     .stream()
                     .map(Product::toString)
                     .toList()

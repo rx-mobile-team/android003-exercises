@@ -5,16 +5,15 @@ import com.rxmobileteam.utils.ExerciseNotCompletedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * {@link ProductDao} represents a Data Access Object (DAO) for products.
  * The implementation is simplified, so it just uses {@link HashSet} to store.
  * <p>
- * todo: 1. Implement a method {@link ProductDao#add(Product)} that store new product into the set
- * todo: 2. Implement a method {@link ProductDao#findAll()} that returns a set of all products
  */
-public class ProductDao {
+public class ProductDao implements Dao {
     private final Set<Product> products = new HashSet<>();
 
     /**
@@ -23,9 +22,9 @@ public class ProductDao {
      * @param product a product to store
      * @return {@code true} if a product was stored, {@code false} otherwise
      */
+    @Override
     public boolean add(@NotNull Product product) {
-        // TODO: implement this method
-        throw new ExerciseNotCompletedException();
+        return products.add(product);
     }
 
     /**
@@ -33,10 +32,17 @@ public class ProductDao {
      *
      * @return a set of all stored products
      */
-    @NotNull
-    public Set<Product> findAll() {
-        // TODO: implement this method
-        throw new ExerciseNotCompletedException();
+    @Override
+    public @NotNull Set<Product> findAll() {
+        return products;
+    }
+
+    @Override
+    public @NotNull List<Product> query(String query) {
+        return products.stream()
+            .filter(it -> it.getName().toLowerCase().contains(query.toLowerCase())
+                || it.getDescription().toLowerCase().contains(query.toLowerCase()))
+            .toList();
     }
 
 }
