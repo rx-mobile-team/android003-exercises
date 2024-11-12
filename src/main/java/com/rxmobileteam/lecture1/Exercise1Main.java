@@ -1,12 +1,14 @@
 package com.rxmobileteam.lecture1;
 
+import com.rxmobileteam.lecture1.data.ProductDao;
 import com.rxmobileteam.lecture1.factory.ProductServiceFactory;
 import com.rxmobileteam.lecture1.service.Product;
 import com.rxmobileteam.lecture1.service.ProductService;
 
 public class Exercise1Main {
     public static void main(String[] args) {
-        ProductService productService = new ProductServiceFactory().createProductService();
+        ProductDao dao = new ProductDao();
+        ProductService productService = new ProductServiceFactory().createProductService(dao);
 
         Product iPhone12 = new Product(
             "1",
