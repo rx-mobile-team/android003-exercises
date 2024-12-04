@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@link ProductDao} represents a Data Access Object (DAO) for products.
@@ -24,8 +25,7 @@ public class ProductDao {
      * @return {@code true} if a product was stored, {@code false} otherwise
      */
     public boolean add(@NotNull Product product) {
-        // TODO: implement this method
-        throw new ExerciseNotCompletedException();
+        return products.add(product);
     }
 
     /**
@@ -35,8 +35,6 @@ public class ProductDao {
      */
     @NotNull
     public Set<Product> findAll() {
-        // TODO: implement this method
-        throw new ExerciseNotCompletedException();
+        return new HashSet<>(products);
     }
-
 }
