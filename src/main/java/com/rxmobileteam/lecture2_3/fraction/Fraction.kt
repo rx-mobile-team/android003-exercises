@@ -1,68 +1,122 @@
 package com.rxmobileteam.lecture2_3.fraction
 
-import com.rxmobileteam.utils.ExerciseNotCompletedException
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 class Fraction private constructor(
   val numerator: Int,
   val denominator: Int,
 ) : Comparable<Fraction> {
   // TODO: Implement the decimal value of the fraction
-  val decimal: Double = throw ExerciseNotCompletedException()
+  val decimal: Double = numerator * 1.0 / denominator
 
   init {
     // TODO: Check validity of numerator and denominator (throw an exception if invalid)
-    throw ExerciseNotCompletedException()
+    require(denominator != 0) {
+      "Denominator must not be zero!"
+    }
+  }
+
+  private fun formatNegativeFraction(fraction: Fraction): Fraction {
+    if (fraction.numerator < 0 && fraction.denominator < 0) {
+      return Fraction(-fraction.numerator, -fraction.denominator)
+    }
+    if (fraction.denominator < 0) {
+      return Fraction(-fraction.numerator, -fraction.denominator)
+    }
+    return Fraction(fraction.numerator, fraction.denominator)
   }
 
   //region unary operators
   // TODO: "+fraction" operator
-  operator fun unaryPlus(): Fraction = throw ExerciseNotCompletedException()
+  operator fun unaryPlus(): Fraction =
+    this.formatNegativeFraction(
+      Fraction(
+        denominator = this.denominator,
+        numerator = this.numerator
+      )
+    )
 
   // TODO: "-fraction" operator
-  operator fun unaryMinus(): Fraction = throw ExerciseNotCompletedException()
+  operator fun unaryMinus(): Fraction =
+    this.formatNegativeFraction(
+      Fraction(
+        denominator = -this.denominator,
+        numerator = this.numerator
+      )
+    )
   //endregion
 
   //region plus operators
   // TODO: "fraction+fraction" operator
-  operator fun plus(other: Fraction): Fraction = throw ExerciseNotCompletedException()
+  operator fun plus(other: Fraction): Fraction = this.formatNegativeFraction(
+    Fraction(
+      this.numerator * other.denominator + this.denominator * other.numerator,
+      this.denominator * other.denominator
+    )
+  )
+
 
   // TODO: "fraction+number" operator
-  operator fun plus(other: Int): Fraction = throw ExerciseNotCompletedException()
+  operator fun plus(other: Int): Fraction = this.formatNegativeFraction(
+    Fraction(this.numerator + other * this.denominator, this.denominator)
+  )
   //endregion
 
   //region times operators
   // TODO: "fraction*fraction" operator
-  operator fun times(other: Fraction): Fraction = throw ExerciseNotCompletedException()
+  operator fun times(other: Fraction): Fraction = this.formatNegativeFraction(
+    Fraction(
+      this.numerator * other.numerator,
+      this.denominator * other.denominator
+    )
+  )
 
   // TODO: "fraction*number" operator
-  operator fun times(number: Int): Fraction = throw ExerciseNotCompletedException()
+  operator fun times(number: Int): Fraction = this.formatNegativeFraction(
+    Fraction(
+      this.numerator * number,
+      this.denominator
+    )
+  )
   //endregion
 
   // TODO: Compare two fractions
-  override fun compareTo(other: Fraction): Int = throw ExerciseNotCompletedException()
+  override fun compareTo(other: Fraction): Int =
+    (this.numerator * other.denominator - this.denominator * other.numerator) / this.denominator * other.denominator
 
   //region toString, hashCode, equals, copy
   // TODO: Format the fraction as a string (e.g. "1/2")
-  override fun toString(): String = throw ExerciseNotCompletedException()
+  override fun toString(): String {
+    val fractionFormatted = formatNegativeFraction(this)
+    return "${fractionFormatted.numerator}/${fractionFormatted.denominator}"
+  }
 
   // TODO: Implement hashCode
-  override fun hashCode(): Int = throw ExerciseNotCompletedException()
+  override fun hashCode(): Int = 31 * this.numerator + this.denominator
 
   // TODO: Implement equals
-  override fun equals(other: Any?): Boolean = throw ExerciseNotCompletedException()
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    return if (other is Fraction) {
+      this.numerator == other.numerator && this.denominator == other.denominator
+    } else {
+      false
+    }
+  }
 
   // TODO: Implement copy
   fun copy(
     numerator: Int = this.numerator,
     denominator: Int = this.denominator
-  ): Fraction = throw ExerciseNotCompletedException()
+  ): Fraction = Fraction(numerator, denominator)
   //endregion
 
   companion object {
     @JvmStatic
     fun ofInt(number: Int): Fraction {
       // TODO: Returns a fraction from an integer number
-      throw ExerciseNotCompletedException()
+      return Fraction(number, 1)
     }
 
     @JvmStatic
@@ -70,40 +124,59 @@ class Fraction private constructor(
       // TODO: Check validity of numerator and denominator
       // TODO: Simplify fraction using the greatest common divisor
       // TODO: Finally, return the fraction with the correct values
-      throw ExerciseNotCompletedException()
+      return simplify(numerator, denominator)
+    }
+
+    private fun simplify(numerator: Int, denominator: Int): Fraction {
+      val gcdValue = gcd(numerator, denominator)
+      val simplifiedNumerator = numerator / gcdValue
+      val simplifiedDenominator = denominator / gcdValue
+      return if (simplifiedDenominator < 0) {
+        Fraction(-simplifiedNumerator, -simplifiedDenominator)
+      } else {
+        Fraction(simplifiedNumerator, simplifiedDenominator)
+      }
+    }
+
+    private fun gcd(a: Int, b: Int): Int {
+      return if (b == 0) a else gcd(b, a % b)
     }
   }
 }
 
 // TODO: return a Fraction representing "this/denominator"
-infix fun Int.over(denominator: Int): Fraction = throw ExerciseNotCompletedException()
+infix fun Int.over(denominator: Int): Fraction = Fraction.of(this, denominator)
 
 //region get extensions
 // TODO: get the numerator, eg. "val (numerator) = Fraction.of(1, 2)"
-operator fun Fraction.component1(): Int = throw ExerciseNotCompletedException()
+operator fun Fraction.component1(): Int = this.numerator
 
 // TODO: get the denominator, eg. "val (_, denominator) = Fraction.of(1, 2)"
-operator fun Fraction.component2(): Int = throw ExerciseNotCompletedException()
+operator fun Fraction.component2(): Int = this.denominator
 
 // TODO: get the decimal, index must be 0 or 1
 // TODO: eg. "val numerator = Fraction.of(1, 2)[0]"
 // TODO: eg. "val denominator = Fraction.of(1, 2)[1]"
 // TODO: eg. "val denominator = Fraction.of(1, 2)[2]" should throw an exception
-operator fun Fraction.get(index: Int): Int = throw ExerciseNotCompletedException()
+operator fun Fraction.get(index: Int): Int = when (index) {
+  0 -> this.numerator
+  1 -> this.denominator
+  else -> throw IndexOutOfBoundsException("Index $index is out of bounds")
+}
 //endregion
 
 //region to number extensions
 // TODO: round to the nearest integer
-fun Fraction.roundToInt(): Int = throw ExerciseNotCompletedException()
+fun Fraction.roundToInt(): Int = decimal.roundToInt()
 
 // TODO: round to the nearest long
-fun Fraction.roundToLong(): Long = throw ExerciseNotCompletedException()
+fun Fraction.roundToLong(): Long = decimal.roundToLong()
 
 // TODO: return the decimal value as a float
-fun Fraction.toFloat(): Float = throw ExerciseNotCompletedException()
+fun Fraction.toFloat(): Float = decimal.toFloat()
 
 // TODO: return the decimal value as a double
-fun Fraction.toDouble(): Double = throw ExerciseNotCompletedException()
+fun Fraction.toDouble(): Double = decimal
 //endregion
 
 fun main() {
@@ -151,7 +224,11 @@ fun main() {
   println("Copy 1/2: ${Fraction.of(1, 2).copy()}")
   println("Copy 1/2 with numerator 2: ${Fraction.of(1, 2).copy(numerator = 2)}")
   println("Copy 1/2 with denominator 3: ${Fraction.of(1, 2).copy(denominator = 3)}")
-  println("Copy 1/2 with numerator 2 and denominator 3: ${Fraction.of(1, 2).copy(numerator = 2, denominator = 3)}")
+  println(
+    "Copy 1/2 with numerator 2 and denominator 3: ${
+      Fraction.of(1, 2).copy(numerator = 2, denominator = 3)
+    }"
+  )
   println("-".repeat(80))
 
   // Component1, Component2 operators
