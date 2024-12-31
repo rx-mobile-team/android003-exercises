@@ -7,22 +7,20 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 
 suspend fun longComputation(delay: Duration): Int {
   delay(delay)
   return Random.nextInt()
 }
 
-suspend fun timeoutComputationThrows(delay: Duration): Int {
-  TODO("Implement timeout computation")
-  // Calls longComputation() and returns its result
-  // If longComputation() takes more than 500 ms, throws TimeoutException
+suspend fun timeoutComputationThrows(delay: Duration): Int = withTimeout(500) {
+  longComputation(delay)
 }
 
-suspend fun timeoutComputationReturnsNull(delay: Duration): Int? {
-  TODO("Implement timeout computation")
-  // Calls longComputation() and returns its result
-  // If longComputation() takes more than 500 ms, returns null
+suspend fun timeoutComputationReturnsNull(delay: Duration): Int? = withTimeoutOrNull(500) {
+  longComputation(delay)
 }
 
 fun main() = runBlocking {
