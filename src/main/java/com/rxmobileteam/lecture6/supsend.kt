@@ -1,10 +1,7 @@
 package com.rxmobileteam.lecture6
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import java.util.*
+import kotlinx.coroutines.*
 
 @JvmInline
 value class UserId(val id: Int)
@@ -75,24 +72,36 @@ internal class RealUserRepository(
   private val userApi: UserApi,
   private val ioDispatcher: CoroutineDispatcher,
 ) : UserRepository {
-  override suspend fun findUserById(id: UserId): User? {
-    // Call userApi's methods on ioDispatcher
-    TODO("Not yet implemented")
+  override suspend fun findUserById(id: UserId): User? = withContext(ioDispatcher) {
+    userApi.findUserById(id)
   }
 
-  override suspend fun getPostsByUserId(id: UserId): List<Post> {
-    // Call userApi's methods on ioDispatcher
-    TODO("Not yet implemented")
+
+  override suspend fun getPostsByUserId(id: UserId): List<Post> = withContext(ioDispatcher) {
+    userApi.findUserById(id)?.let { user -> userApi.getPostsByUser(user) } ?: emptyList()
   }
 
-  override suspend fun findUserAndPostsById(id: UserId): UserAndPosts? {
-    // Call userApi's methods on ioDispatcher
-    TODO("Not yet implemented")
+  override suspend fun findUserAndPostsById(id: UserId): UserAndPosts? = withContext(ioDispatcher) {
+    val user = userApi.findUserById(id)
+    val postList = getPostsByUserId(id)
+    user?.let { UserAndPosts(user, postList) }
   }
 
-  override suspend fun findUserAndUserDetailsById(id: UserId): UserAndDetails? {
-    // Call concurrently userApi's methods on ioDispatcher
-    TODO("Not yet implemented")
+  override suspend fun findUserAndUserDetailsById(id: UserId): UserAndDetails? = withContext(ioDispatcher) {
+    val userDeferred = async {
+      delay(1000L)
+      userApi.findUserById(id)
+    }
+    val userDetailDeferred = async {
+      delay(2000L)
+      userApi.findDetailsByUser(id)
+    }
+
+    userDeferred.await()?.let { user ->
+      userDetailDeferred.await()?.let { userDetail ->
+        UserAndDetails(user, userDetail)
+      }
+    }
   }
 }
 

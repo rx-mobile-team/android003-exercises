@@ -5,8 +5,14 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 import kotlin.random.Random
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 private class GetDataRequestException(cause: Throwable?) : RuntimeException(cause)
 
@@ -75,7 +81,7 @@ private class GetDataRequest<V>(
     when (val currentState = state) {
       is GetDataRequestState.Idle,
       is GetDataRequestState.Cancelled,
-      -> return
+        -> return
 
       is GetDataRequestState.Running -> {
         currentState.future.cancel(true)
@@ -92,7 +98,17 @@ private class GetDataRequest<V>(
 
 // TODO: Implement the following extension function (convert callback-based API to suspend function)
 // Hint: use kotlin.coroutines.Continuation<T>
-private suspend fun <V> GetDataRequest<V>.startAndAwait(): Result<V> = throw ExerciseNotCompletedException()
+private suspend fun <V> GetDataRequest<V>.startAndAwait(): Result<V> =
+  suspendCancellableCoroutine { continuation ->
+    start(
+      onCancel = {
+        continuation.resumeWithException(CancellationException("Operation cancelled"))
+      },
+      onResult = { result ->
+        continuation.resume(result)
+      }
+    )
+  }
 
 fun main() {
   GetDataRequest {

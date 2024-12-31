@@ -37,7 +37,14 @@ class DemoModel(
     // Note: You must preserve the cancellation semantics of the coroutine
 
     scope.launch {
-      maybeFailedFunction()
+      try {
+        val result = maybeFailedFunction()
+        logger.log("the result of maybeFailedFunction::: $result")
+      } catch (cancel: CancellationException) {
+        throw cancel
+      } catch (e: Exception) {
+        logger.logError(Throwable(e), e.message ?: "Unknown error")
+      }
     }
   }
 
